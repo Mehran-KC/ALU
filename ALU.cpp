@@ -19,7 +19,6 @@ void decimalToBinary(int decimalNumber, int binaryNumber[]) {
     }
 }
 
-
 void add(int *in1, int *in2, int *out) {
     int carry = 0;
     for (int i = 31; i >= 0; i--) {
@@ -85,6 +84,12 @@ void bitwise_or(int *in1, int *in2, int *out) {
     }
 }
 
+void bitwise_not(int* in, int* out) {
+    for (int i = 0; i < 16; i++) {
+        out[i] = !in[i]; // perform bitwise NOT
+    }
+}
+
 void bitwise_xor(int *in1, int *in2, int *out) {
     for (int i = 0; i < 32; i++) {
         out[i] = in1[i] ^ in2[i];
@@ -94,6 +99,18 @@ void bitwise_xor(int *in1, int *in2, int *out) {
 void bitwise_nand(int* in1, int* in2, int* out) {
     for (int i = 0; i < 32; i++) {
         out[i] = !(in1[i] & in2[i]); // perform bitwise NAND
+    }
+}
+
+void bitwise_nor(int* in1, int* in2, int* out) {
+    for (int i = 0; i < 16; i++) {
+        out[i] = !(in1[i] | in2[i]); // perform bitwise NOR
+    }
+}
+
+void bitwise_xnor(int* in1, int* in2, int* out) {
+    for (int i = 0; i < 16; i++) {
+        out[i] = !(in1[i] ^ in2[i]); // perform bitwise XNOR
     }
 }
 
@@ -121,12 +138,11 @@ void decrement(int *in, int *out) {
 }
 
 void menu() {
-    cout << "-------------------------------------------\n" << colors::bright_yellow << "[0] Add\n[1] Subtract\n[2] Logical Shift Right\n[3] Logical Shift Left\n[4] Bitwise AND\n[5] Bitwise OR\n[6] Bitwise XOR\n[7] Increment\n[8] Decrement\n[9] Exit\n[10] Menu\n" << colors::reset;
-    cout << "-------------------------------------------\n" << colors::bright_cyan <<  "\nthe operation code [0-10]: " << colors::reset;
+    cout << "-------------------------------------------\n" << colors::bright_yellow << "[0] Add\n[1] Subtract\n[2] Logical Shift Right\n[3] Logical Shift Left\n[4] Bitwise AND\n[5] Bitwise OR\n[6] Bitwise NOT\n[7] Bitwise XOR\n[8] Bitwise NAND\n[9] Bitwise NOR\n[10] Bitwise XNOR\n[11] Increment\n[12] Decrement\n[13] Demical To Binary\n[14] Exit\n[15] Menu\n" << colors::reset;
+    cout << "-------------------------------------------\n" << colors::bright_cyan <<  "\nThe Operation Code [0-15]: " << colors::reset;
 }
 
 int main() {
-    colors::reset;
 
     int op;
     int in1[32], in2[32], out[32], reg[32];
@@ -135,7 +151,7 @@ int main() {
     menu();
     cin >> op;
 
-    if (op == 0 || op == 1 || op == 4 || op == 5 || op == 6) {
+    if (op == 0 || op == 1 || op == 4 || op == 5 || op == 7 || op == 8 || op == 9 || op == 10) {
         cout << colors::bright_cyan <<  "Enter the first input ( Demical ): " << colors::reset;
         cin >> in1_dec;
         decimalToBinary(in1_dec , in1); // in1[32]
@@ -143,16 +159,16 @@ int main() {
         cout << colors::bright_cyan <<  "Enter the second input ( Demical ): " << colors::reset;
         cin >> in2_dec;
         decimalToBinary(in2_dec, in2); // in2[32]
-    }else if (op == 7 || op == 8) {
-        cout << colors::bright_cyan <<  "Enter the input ( Demical ): " << colors::reset;
-        cin >> in1_dec;
-        decimalToBinary(in1_dec, in1); // in1[32]
     }else if(op == 2 || op == 3){
         cout << colors::bright_cyan <<  "Enter the input ( Demical ): " << colors::reset;
         cin >> in1_dec;
         decimalToBinary(in1_dec, in1); // in1[32]
         cout << colors::bright_cyan <<  "Enter the shift amount ( Demical ): " << colors::reset;
         cin >> shift;
+    }else if (op == 6 || op == 11 || op == 12 || op == 13) {
+        cout << colors::bright_cyan <<  "Enter the input ( Demical ): " << colors::reset;
+        cin >> in1_dec;
+        decimalToBinary(in1_dec, in1); // in1[32]
     }
 
 switch (op) {
@@ -217,7 +233,7 @@ switch (op) {
         cout << endl;
         break;
     case 6:
-        bitwise_xor(in1, in2, out);
+        bitwise_not(in1, out);
         cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
         for (int i = 0; i < 32; i++) {
             cout << out[i];
@@ -227,7 +243,7 @@ switch (op) {
         cout << endl;
         break;
     case 7:
-        increment(in1, out);
+        bitwise_xor(in1, in2, out);
         cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
         for (int i = 0; i < 32; i++) {
             cout << out[i];
@@ -237,7 +253,7 @@ switch (op) {
         cout << endl;
         break;
     case 8:
-        decrement(in1, out);
+        bitwise_nand(in1, in2, out);
         cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
         for (int i = 0; i < 32; i++) {
             cout << out[i];
@@ -247,9 +263,58 @@ switch (op) {
         cout << endl;
         break;
     case 9:
-        cout << colors::bold << "\nExiting..." << colors::reset << endl;
+        bitwise_nor(in1, in2, out);
+        cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
+        for (int i = 0; i < 32; i++) {
+            cout << out[i];
+        }
+        binaryToDecimal(out);
+        cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
+        cout << endl;
         break;
     case 10:
+        bitwise_xnor(in1, in2, out);
+        cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
+        for (int i = 0; i < 32; i++) {
+            cout << out[i];
+        }
+        binaryToDecimal(out);
+        cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
+        cout << endl;
+        break;
+    case 11:
+        increment(in1, out);
+        cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
+        for (int i = 0; i < 32; i++) {
+            cout << out[i];
+        }
+        binaryToDecimal(out);
+        cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
+        cout << endl;
+        break;
+    case 12:
+        decrement(in1, out);
+        cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
+        for (int i = 0; i < 32; i++) {
+            cout << out[i];
+        }
+        binaryToDecimal(out);
+        cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
+        cout << endl;
+        break;
+    case 13:
+        decimalToBinary(in1_dec, out);
+        cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
+        for (int i = 0; i < 32; i++) {
+            cout << out[i]; 
+        }
+        cout << colors::reset << "\n-------------------------------------------\n";
+        cout << endl;
+        break;
+    case 14:
+        cout << colors::bold << "\nExiting..." << colors::reset << endl;
+        break;
+    case 15:
         main();
         break;
     default:
