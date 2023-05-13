@@ -5,18 +5,19 @@
 using namespace std;
 
 int binaryToDecimal(int binaryNumber[]) {
-    int decimalNumber = 0;
+    unsigned int decimalNumber = 0;
     for (int i = 0; i < 32; i++) {
         decimalNumber += binaryNumber[31 - i] * pow(2, i);
     }
     return decimalNumber;
 }
 
-void decimalToBinary(int decimalNumber, int binaryNumber[]) {
+void decimalToBinary(unsigned int decimalNumber, int binaryNumber[]) {
     for (int i = 31; i >= 0; i--) {
         binaryNumber[i] = decimalNumber % 2;
         decimalNumber /= 2;
     }
+
 }
 
 void add(int *in1, int *in2, int *out) {
@@ -55,44 +56,58 @@ void subtract(int *in1, int *in2, int *out) {
 }
 
 void logical_shift_right(int *in, int *out, int shift) {
+    if (shift < 0 || shift > 31) {
+        cout << colors::red << "Error: Invalid number of bits to shift." << colors::reset << endl;
+        return;
+    }
     for (int i = 0; i < shift; i++) {
         out[i] = 0;
     }
     for (int i = shift; i < 32; i++) {
         out[i] = in[i - shift];
     }
+    if (in[0] != out[0]) {
+        cout << colors::red << "Overflow error: Logical shift right has caused overflow." << colors::reset << endl;
+    }
 }
 
 void logical_shift_left(int *in, int *out, int shift) {
+    if (shift < 0 || shift > 31) {
+        cout << colors::red << "Error: Invalid number of bits to shift." << colors::reset << endl;
+        return;
+    }
     for (int i = 0; i < 32 - shift; i++) {
         out[i] = in[i + shift];
     }
     for (int i = 32 - shift; i < 32; i++) {
         out[i] = 0;
     }
+    if (in[31] != out[31]) {
+        cout << colors::red << "Overflow error: Logical shift left has caused overflow." << endl;
+    }
 }
 
 void bitwise_and(int *in1, int *in2, int *out) {
     for (int i = 0; i < 32; i++) {
-        out[i] = in1[i] & in2[i];
+        out[i] = in1[i] & in2[i]; // perform bitwise AND
     }
 }
 
 void bitwise_or(int *in1, int *in2, int *out) {
     for (int i = 0; i < 32; i++) {
-        out[i] = in1[i] | in2[i];
+        out[i] = in1[i] | in2[i]; // perform bitwise OR
     }
 }
 
 void bitwise_not(int* in, int* out) {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 32; i++) {
         out[i] = !in[i]; // perform bitwise NOT
     }
 }
 
 void bitwise_xor(int *in1, int *in2, int *out) {
     for (int i = 0; i < 32; i++) {
-        out[i] = in1[i] ^ in2[i];
+        out[i] = in1[i] ^ in2[i]; // perform bitwise XOR
     }
 }
 
@@ -103,18 +118,22 @@ void bitwise_nand(int* in1, int* in2, int* out) {
 }
 
 void bitwise_nor(int* in1, int* in2, int* out) {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 32; i++) {
         out[i] = !(in1[i] | in2[i]); // perform bitwise NOR
     }
 }
 
 void bitwise_xnor(int* in1, int* in2, int* out) {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 32; i++) {
         out[i] = !(in1[i] ^ in2[i]); // perform bitwise XNOR
     }
 }
 
 void increment(int *in, int *out) {
+    if (in[0] == 1) {
+        cout << colors::red << "Error: Incrementing 1 will cause overflow." << colors::reset << endl;
+        return;
+    }
     int carry = 1;
     for (int i = 31; i >= 0; i--) {
         int sum = in[i] + carry;
@@ -145,8 +164,8 @@ void menu() {
 int main() {
 
     int op;
-    int in1[32], in2[32], out[32], reg[32];
-    int in1_dec, in2_dec, out_dec, reg_dec, shift;
+    int in1[32], in2[32], out[32];
+    int in1_dec, in2_dec, out_dec, shift;
     
     menu();
     cin >> op;
