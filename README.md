@@ -19,6 +19,7 @@ This is a simple ALU (Arithmetic Logic Unit) program implemented in C++. The pro
 - Increment: Increment a binary number by 1.
 - Decrement: Decrement a binary number by 1.
 
+---
 ## Usage
 
 1. Clone the repository to your local machine.
@@ -32,14 +33,15 @@ This is a simple ALU (Arithmetic Logic Unit) program implemented in C++. The pro
    ```
    a.exe
    ```
-5. Run the compiled executable.
-6. Follow the on-screen instructions to select an operation and provide the required inputs.
-7. The program will display the results in both binary and decimal formats.
+4. Run the compiled executable.
+5. Follow the on-screen instructions to select an operation and provide the required inputs.
+6. The program will display the results in both binary and decimal formats.
+
+---
 
 ## Dependencies
 
 The program does not have any external dependencies and only requires a C++ compiler to compile and run.
----
 
 # Important 
 Folder Include (Header) should be in same folder with project.
