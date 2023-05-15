@@ -25,7 +25,8 @@ This is a simple ALU (Arithmetic Logic Unit) program implemented in C++. The pro
 1. Clone the repository to your local machine.
 2. Open the terminal and navigate to the project directory.
 3. Compile the program using a C++ compiler (e.g., g++).
-   for example in ** Windows ** you can install g++ and type 
+
+   for example in **Windows** you can install g++ and type 
    ```
    g++ ALU.cpp
    ```
