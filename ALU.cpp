@@ -4,15 +4,16 @@
 
 using namespace std;
 
+
 int binaryToDecimal(int binaryNumber[]) {
-    unsigned int decimalNumber = 0;
+    long long int decimalNumber = 0;
     for (int i = 0; i < 32; i++) {
         decimalNumber += binaryNumber[31 - i] * pow(2, i);
     }
     return decimalNumber;
 }
 
-void decimalToBinary(unsigned int decimalNumber, int binaryNumber[]) {
+void decimalToBinary(long long int decimalNumber, int binaryNumber[]) {
     for (int i = 31; i >= 0; i--) {
         binaryNumber[i] = decimalNumber % 2;
         decimalNumber /= 2;
@@ -27,13 +28,14 @@ void add(int *in1, int *in2, int *out) {
         out[i] = sum % 2;
         carry = sum / 2;
     }
-    if (carry > 0)
-    {
+    // Test with 4294967295 + 1
+    // اینجا تلاش کردم که اعداد منفی هم تاحد خوبی قبول کنه و نشون بده نمیدونم چقدر موفق شدم !!
+    if (carry > 0){
         cout << colors::red << "Result Is Too Big For 32bit\n" << colors::reset;
         throw overflow_error("Overflow error: result too large to fit in 32 bits.");
     }
-    
 }
+
 
 void subtract(int *in1, int *in2, int *out) {
     int borrow = 0;
@@ -47,18 +49,17 @@ void subtract(int *in1, int *in2, int *out) {
         }
         out[i] = diff;
     }
-    if (borrow > 0)
-    {
-        cout << colors::red << "Result Is Too Small For 32bit\n" << colors::reset;
-        throw underflow_error("Underflow error: result too small to fit in 32 bits.");
+    if (borrow > 0) {
+        cout << colors::red << "Result is too small for 32-bit signed integer (underflow)."<< colors::reset << endl;
+        throw underflow_error("Underflow error: result too small to fit in 32-bit signed integer.");
     }
-    
+
 }
 
 void logical_shift_right(int *in, int *out, int shift) {
     if (shift < 0 || shift > 31) {
         cout << colors::red << "Error: Invalid number of bits to shift." << colors::reset << endl;
-        return;
+        throw invalid_argument("Invalid argument: number of bits to shift must be between 0 and 31.");
     }
     for (int i = 0; i < shift; i++) {
         out[i] = 0;
@@ -68,13 +69,14 @@ void logical_shift_right(int *in, int *out, int shift) {
     }
     if (in[0] != out[0]) {
         cout << colors::red << "Overflow error: Logical shift right has caused overflow." << colors::reset << endl;
+        throw overflow_error("Overflow error: result too large to fit in 32 bits.");
     }
 }
 
 void logical_shift_left(int *in, int *out, int shift) {
     if (shift < 0 || shift > 31) {
         cout << colors::red << "Error: Invalid number of bits to shift." << colors::reset << endl;
-        return;
+        throw invalid_argument("Invalid argument: number of bits to shift must be between 0 and 31.");
     }
     for (int i = 0; i < 32 - shift; i++) {
         out[i] = in[i + shift];
@@ -84,6 +86,7 @@ void logical_shift_left(int *in, int *out, int shift) {
     }
     if (in[31] != out[31]) {
         cout << colors::red << "Overflow error: Logical shift left has caused overflow." << endl;
+        throw overflow_error("Overflow error: result too large to fit in 32 bits.");
     }
 }
 
@@ -130,19 +133,30 @@ void bitwise_xnor(int* in1, int* in2, int* out) {
 }
 
 void increment(int *in, int *out) {
-    if (in[0] == 1) {
-        cout << colors::red << "Error: Incrementing 1 will cause overflow." << colors::reset << endl;
-        return;
-    }
+
     int carry = 1;
     for (int i = 31; i >= 0; i--) {
         int sum = in[i] + carry;
         out[i] = sum % 2;
         carry = sum / 2;
     }
+        if (carry > 0) {
+        if (in[0] == 1) {
+            cout << colors::red << "Error: Incrementing 1 will cause overflow." << colors::reset << endl;
+            throw overflow_error("Overflow error: result too large to fit in 32 bits.");
+        }
+        else {
+            cout << colors::red << "Error: Increment operation caused overflow." << colors::reset << endl;
+            throw overflow_error("Overflow error: result too large to fit in 32 bits.");
+        }
+    }
 }
 
 void decrement(int *in, int *out) {
+    if (in[0] == 0) {
+        cout << colors::red << "Error: Decrementing will cause underflow." << colors::reset << endl;
+        throw underflow_error("Underflow error: result too small to fit in 32 bits.");
+    }
     int borrow = 1;
     for (int i = 31; i >= 0; i--) {
         int diff = in[i] - borrow;
@@ -165,7 +179,7 @@ int main() {
 
     int op;
     int in1[32], in2[32], out[32];
-    int in1_dec, in2_dec, out_dec, shift;
+    long long int in1_dec, in2_dec, out_dec, shift;
     
     menu();
     cin >> op;
@@ -192,22 +206,22 @@ int main() {
 
 switch (op) {
     case 0:
-        add(in1, in2, out);
+        add(in1, in2, out);        
         cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
-        for (int i = 0; i < 32; i++) {
+        for(int i = 0; i < 32; i++){
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
     case 1:
         subtract(in1, in2, out);
         cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
-        for (int i = 0; i < 32; i++) {
+        for(int i = 0; i < 32; i++){
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -217,7 +231,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+        
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -227,7 +241,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -237,7 +251,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -247,12 +261,12 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
     case 6:
-        bitwise_not(in1, out);
+
         cout << "\n-------------------------------------------\n" << colors::green << colors::bold << colors::italic << "Result(Binary): ";
         for (int i = 0; i < 32; i++) {
             cout << out[i];
@@ -267,7 +281,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -277,7 +291,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -287,7 +301,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -297,7 +311,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -307,7 +321,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
@@ -317,7 +331,7 @@ switch (op) {
         for (int i = 0; i < 32; i++) {
             cout << out[i];
         }
-        binaryToDecimal(out);
+
         cout << "\nResult(Decimal): " << binaryToDecimal(out) << colors::reset << "\n-------------------------------------------\n";
         cout << endl;
         break;
